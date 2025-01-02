@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-primary to-secondary text-white min-h-screen;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* FullPage.js styles */
+#fp-nav ul li a span,
+.fp-slidesNav ul li a span {
+  background: white !important;
+}
+
+#fp-nav ul li .fp-tooltip {
+  color: white !important;
+  font-family: theme('fontFamily.sans') !important;
+}
+
+/* Base styles */
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Section styles */
+.section {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  @apply py-20 px-4 md:px-8;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white/10 backdrop-blur-lg rounded-xl p-6 hover:scale-105 transition-transform duration-300;
+}
+
+/* Typography */
+.title {
+  @apply text-4xl md:text-5xl font-bold mb-8 text-center text-white;
+}
+
+.subtitle {
+  @apply text-xl md:text-2xl font-semibold mb-4;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch device support */
+@media (hover: none) and (pointer: coarse) {
+  .section {
+    touch-action: none;
+  }
+}
+
+/* Smooth transition between sections */
+.fp-overflow {
+  will-change: transform;
+}
+
+/* Hide FullPage.js watermark */
+.fp-watermark {
+  display: none !important;
+}
