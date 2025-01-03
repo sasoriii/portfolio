@@ -1,25 +1,5 @@
-import { motion } from 'framer-motion';
-
-const projects = [
-  {
-    title: "Le bureau du vent",
-    description: "Site web de réservation de cours de kitesurf en ligne",
-    tech: ["React", "PHP", "Google Cloud Platform"],
-    link: "https://www.le-bureau-du-vent.com",
-  },
-  {
-    title: "Projet interne",
-    description: "Outil de redirection de flux",
-    tech: ["PHP", "CodeIgniter", "Laravel"],
-    link: "#",
-  },
-  {
-    title: "Projet WIP",
-    description: "etc",
-    tech: [""],
-    link: "#",
-  },
-];
+import { motion, useMotionValue, useTransform, useSpring, useAnimation } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,89 +12,165 @@ const containerVariants = {
 };
 
 const titleVariants = {
-  hidden: { opacity: 0, y: -20 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
-      ease: "easeOut"
+      duration: 0.7,
+      ease: [0.43, 0.13, 0.23, 0.96]
     }
   }
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: "easeOut"
-    }
-  }
+interface ProjectCardProps {
+  title: string;
+  description: string;
+  url: string;
+  fallbackImage?: string;
+}
+
+const ProjectCard = ({ title, description, url, fallbackImage }: ProjectCardProps) => {
+  const controls = useAnimation();
+  const [iframeError, setIframeError] = useState(false);
+  
+  const y = useSpring(0, {
+    stiffness: 100,
+    damping: 30
+  });
+  
+  const rotateX = useSpring(0, {
+    stiffness: 100,
+    damping: 30
+  });
+  
+  const rotateY = useSpring(0, {
+    stiffness: 100,
+    damping: 30
+  });
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateXValue = ((mouseY - centerY) / centerY) * 10;
+    const rotateYValue = ((mouseX - centerX) / centerX) * 10;
+    
+    rotateX.set(rotateXValue);
+    rotateY.set(-rotateYValue);
+    y.set(-5);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+    y.set(0);
+  };
+
+  const handleIframeError = () => {
+    setIframeError(true);
+  };
+
+  const style = {
+    y,
+    rotateX,
+    rotateY
+  };
+
+  return (
+    <motion.div
+      variants={titleVariants}
+      style={style}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="group relative h-[500px] card-container cursor-pointer"
+      onClick={() => window.open(url, '_blank')}
+    >
+      <div className="card h-full transform-gpu z-10">
+        <div className="relative z-10 h-full flex flex-col">
+          <div className="relative h-72 w-full mb-4 overflow-hidden rounded-t-xl bg-gray-800">
+            {!iframeError ? (
+              <iframe
+                src={url}
+                className="w-full h-full transform scale-[0.6] origin-top-left"
+                onError={handleIframeError}
+                style={{
+                  width: '170%',
+                  height: '170%',
+                  pointerEvents: 'none'
+                }}
+              />
+            ) : fallbackImage ? (
+              <img
+                src={fallbackImage}
+                alt={title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-purple-200">
+                <span>Aperçu non disponible</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50"></div>
+          </div>
+          <div className="p-8 flex flex-col flex-grow">
+            <div className="h-2 w-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded mb-6"></div>
+            <h3 className="text-2xl font-bold text-purple-200 mb-4">{title}</h3>
+            <p className="text-purple-100/90 flex-grow text-lg">
+              {description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 };
 
 export const Projects = () => {
+  const projects = [
+    {
+      title: "Le bureau du vent",
+      description: "Site web de réservation de cours de kitesurf en ligne",
+      url: "https://www.le-bureau-du-vent.com",
+      fallbackImage: "/le-bureau-du-vent.png"
+    },
+    {
+      title: "Projet interne",
+      description: "Outil de redirection de flux",
+      url: "#",
+      fallbackImage: "/projet-interne.png"
+    },
+    {
+      title: "Projet WIP",
+      description: "etc",
+      url: "#",
+      fallbackImage: "/projet-wip.png"
+    }
+  ];
+
   return (
-    <section id="projects" className="section">
+    <section id="projects" className="section overflow-hidden">
       <motion.div
         variants={containerVariants}
         initial="hidden"
+        animate="visible"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
+        className="max-w-[95vw] mx-auto"
       >
-        <motion.h2 variants={titleVariants} className="title">
+        <motion.h2 variants={titleVariants} className="title text-purple-200 mb-16">
           Mes Projets
         </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="flex gap-8 overflow-x-auto pb-8 pt-12 snap-x snap-mandatory hide-scrollbar px-12">
           {projects.map((project, index) => (
-            <motion.div
-              key={index}
-              variants={cardVariants}
-              whileHover={{
-                scale: 1.05,
-                transition: { duration: 0.2 }
-              }}
-              className="card"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="subtitle">{project.title}</h3>
-                <a
-                  href={project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:text-white/80 transition"
-                  aria-label={`Voir le projet ${project.title}`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                    />
-                  </svg>
-                </a>
-              </div>
-              <p className="text-gray-300 mb-4">{project.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {project.tech.map((tech, techIndex) => (
-                  <span
-                    key={techIndex}
-                    className="px-2 py-1 bg-purple-500/20 rounded-md text-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
+            <div key={index} className={`min-w-[600px] snap-center pt-8 ${
+              index === 0 ? 'pl-8' : index === projects.length - 1 ? 'pr-8' : ''
+            }`}>
+              <ProjectCard {...project} />
+            </div>
           ))}
         </div>
       </motion.div>

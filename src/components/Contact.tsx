@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion } from 'framer-motion';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
+import { MdEmail } from 'react-icons/md';
+import { MdPhone } from 'react-icons/md'; 
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -35,39 +35,51 @@ export const Contact = () => {
         viewport={{ once: true, amount: 0.3 }}
         className="max-w-xl mx-auto"
       >
-        <motion.h2 variants={itemVariants} className="title">
+        <motion.h2 variants={itemVariants} className="title text-purple-200">
           Contact
         </motion.h2>
-        <motion.form variants={containerVariants} className="space-y-6">
-          <motion.div variants={itemVariants}>
-            <Input
-              placeholder="Votre nom"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/60 transition-all duration-300 focus:scale-[1.02]"
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <Input
-              type="email"
-              placeholder="Votre email"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/60 transition-all duration-300 focus:scale-[1.02]"
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <Textarea
-              placeholder="Votre message"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/60 min-h-[150px] transition-all duration-300 focus:scale-[1.02]"
-            />
-          </motion.div>
-          <motion.div variants={itemVariants}>
-            <Button
-              className="w-full bg-accent hover:bg-accent/80 transition-all duration-300 transform hover:scale-[1.02]"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Envoyer
-            </Button>
-          </motion.div>
-        </motion.form>
+        <motion.div variants={containerVariants} className="flex justify-center gap-8">
+          <motion.a
+            href="https://github.com/sasoriii"
+            target="_blank"
+            rel="noopener noreferrer"
+            variants={itemVariants}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-4xl text-white hover:text-accent transition-colors duration-300"
+          >
+            <FaGithub />
+          </motion.a>
+          <motion.a
+            href="https://www.linkedin.com/in/jeremy-gabriel-108098185/"
+            target="_blank"
+            rel="noopener noreferrer"
+            variants={itemVariants}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-4xl text-white hover:text-accent transition-colors duration-300"
+          >
+            <FaLinkedin />
+          </motion.a>
+          <motion.a
+            href="mailto:jeremy.gabriel0150@gmail.com"
+            variants={itemVariants}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-4xl text-white hover:text-accent transition-colors duration-300"
+          >
+            <MdEmail />
+          </motion.a>
+          <motion.a
+            href="tel:+33651153213"
+            variants={itemVariants}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="text-4xl text-white hover:text-accent transition-colors duration-300"
+          >
+            <MdPhone />
+          </motion.a>
+        </motion.div>
       </motion.div>
     </section>
   );
