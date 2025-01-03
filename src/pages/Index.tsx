@@ -85,25 +85,39 @@ const Index = () => {
   }, [currentSection]);
 
   return (
-    <SectionContext.Provider value={{ currentSection, setCurrentSection }}>
-      <div className="h-screen w-screen overflow-hidden relative">
+    <SectionContext.Provider value={{ currentSection, totalSections: sections.length }}>
+      <div className="relative h-screen overflow-hidden">
         <ThreeScene />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            {sections[currentSection].component}
-          </AnimatePresence>
-        </div>
-        <div className="fixed right-8 top-1/2 transform -translate-y-1/2 space-y-4">
+        
+        {/* Navigation dots */}
+        <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-50">
           {sections.map((_, index) => (
             <button
               key={index}
               onClick={() => scrollToSection(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                currentSection === index ? 'bg-purple-500 scale-125' : 'bg-purple-300'
+              className={`block w-3 h-3 my-2 rounded-full transition-all duration-300 ${
+                currentSection === index
+                  ? 'bg-purple-300 scale-125'
+                  : 'bg-purple-300/30 hover:bg-purple-300/50'
               }`}
+              aria-label={`Aller à la section ${index + 1}`}
             />
           ))}
         </div>
+
+        {/* Sections */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSection}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="h-screen flex items-center justify-center p-4 md:p-8"
+          >
+            {sections[currentSection].component}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </SectionContext.Provider>
   );

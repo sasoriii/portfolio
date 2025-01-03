@@ -58,7 +58,7 @@ export const ThreeScene = () => {
     };
   }>({});
   
-  const { currentSection } = useSection();
+  const { currentSection, totalSections } = useSection();
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -70,37 +70,35 @@ export const ThreeScene = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    // Configuration de la caméra
-    camera.position.z = 5;
-
-    // Création du système de particules
-    const particleCount = 1000;
-    const positions = new Float32Array(particleCount * 3);
-    const velocities = new Float32Array(particleCount * 3);
-    const originalPositions = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      const radius = Math.random() * 4;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-
-      positions[i] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i + 2] = radius * Math.cos(phi);
-
-      originalPositions[i] = positions[i];
-      originalPositions[i + 1] = positions[i + 1];
-      originalPositions[i + 2] = positions[i + 2];
-
-      velocities[i] = (Math.random() - 0.5) * 0.01;
-      velocities[i + 1] = (Math.random() - 0.5) * 0.01;
-      velocities[i + 2] = (Math.random() - 0.5) * 0.01;
+    // Création des particules réactives
+    const particlesCount = 3000;
+    const positions = new Float32Array(particlesCount * 3);
+    const velocities = new Float32Array(particlesCount * 3);
+    const originalPositions = new Float32Array(particlesCount * 3);
+    
+    for(let i = 0; i < particlesCount * 3; i += 3) {
+      const spread = 30;
+      const x = (Math.random() - 0.5) * spread;
+      const y = (Math.random() - 0.5) * spread;
+      const z = (Math.random() - 0.5) * spread * 0.5;
+      
+      positions[i] = x;
+      positions[i + 1] = y;
+      positions[i + 2] = z;
+      
+      originalPositions[i] = x;
+      originalPositions[i + 1] = y;
+      originalPositions[i + 2] = z;
+      
+      velocities[i] = 0;
+      velocities[i + 1] = 0;
+      velocities[i + 2] = 0;
     }
 
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const material = new THREE.ShaderMaterial({
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const particlesMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
         mouse: { value: new THREE.Vector2(0, 0) },
@@ -113,15 +111,18 @@ export const ThreeScene = () => {
       depthWrite: false
     });
 
-    const particles = new THREE.Points(geometry, material);
-    scene.add(particles);
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
 
+    camera.position.z = 15;
+
+    // Store references
     sceneRef.current = {
       scene,
       camera,
       renderer,
-      material,
-      particles,
+      material: particlesMaterial,
+      particles: particlesMesh,
       particleSystem: {
         positions,
         velocities,
@@ -129,76 +130,89 @@ export const ThreeScene = () => {
       }
     };
 
+    // Mouse movement handler
     const handleMouseMove = (event: MouseEvent) => {
       targetMouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
       targetMouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
     };
 
+    // Animation
+    let frame = 0;
     const animate = () => {
-      if (!sceneRef.current.material || !sceneRef.current.particles || !sceneRef.current.particleSystem) return;
+      frame = requestAnimationFrame(animate);
+      const time = Date.now() * 0.001;
 
-      const positions = sceneRef.current.particles.geometry.attributes.position.array as Float32Array;
-      const velocities = sceneRef.current.particleSystem.velocities;
-      const originalPositions = sceneRef.current.particleSystem.originalPositions;
+      if (sceneRef.current.material && sceneRef.current.particles) {
+        // Smooth mouse movement
+        mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.05;
+        mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.05;
 
-      // Mise à jour de la position de la souris avec lerp
-      mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * 0.1;
-      mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * 0.1;
+        // Update uniforms
+        sceneRef.current.material.uniforms.time.value = time;
+        sceneRef.current.material.uniforms.mouse.value = new THREE.Vector2(mouseRef.current.x, mouseRef.current.y);
+        sceneRef.current.material.uniforms.scroll.value = currentSection / (totalSections - 1);
 
-      // Animation des particules
-      for (let i = 0; i < positions.length; i += 3) {
-        positions[i] += velocities[i];
-        positions[i + 1] += velocities[i + 1];
-        positions[i + 2] += velocities[i + 2];
+        // Particle system update
+        const positions = sceneRef.current.particles.geometry.attributes.position.array;
+        const velocities = sceneRef.current.particleSystem!.velocities;
+        const originalPositions = sceneRef.current.particleSystem!.originalPositions;
 
-        // Force de retour vers la position d'origine
-        const dx = originalPositions[i] - positions[i];
-        const dy = originalPositions[i + 1] - positions[i + 1];
-        const dz = originalPositions[i + 2] - positions[i + 2];
+        for(let i = 0; i < positions.length; i += 3) {
+          // Effet d'attraction vers la souris
+          const dx = mouseRef.current.x * 10 - positions[i];
+          const dy = mouseRef.current.y * 10 - positions[i + 1];
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 5) {
+            velocities[i] += dx * 0.002;
+            velocities[i + 1] += dy * 0.002;
+          }
 
-        velocities[i] += dx * 0.002;
-        velocities[i + 1] += dy * 0.002;
-        velocities[i + 2] += dz * 0.002;
+          // Retour à la position d'origine
+          velocities[i] += (originalPositions[i] - positions[i]) * 0.01;
+          velocities[i + 1] += (originalPositions[i + 1] - positions[i + 1]) * 0.01;
+          velocities[i + 2] += (originalPositions[i + 2] - positions[i + 2]) * 0.01;
 
-        // Amortissement
-        velocities[i] *= 0.98;
-        velocities[i + 1] *= 0.98;
-        velocities[i + 2] *= 0.98;
+          // Appliquer les vélocités
+          positions[i] += velocities[i];
+          positions[i + 1] += velocities[i + 1];
+          positions[i + 2] += velocities[i + 2];
+
+          // Amortissement
+          velocities[i] *= 0.95;
+          velocities[i + 1] *= 0.95;
+          velocities[i + 2] *= 0.95;
+        }
+
+        sceneRef.current.particles.geometry.attributes.position.needsUpdate = true;
       }
 
-      // Mise à jour des uniforms
-      sceneRef.current.material.uniforms.time.value += 0.01;
-      sceneRef.current.material.uniforms.mouse.value.set(mouseRef.current.x, mouseRef.current.y);
-      sceneRef.current.material.uniforms.scroll.value = currentSection;
-
-      sceneRef.current.particles.geometry.attributes.position.needsUpdate = true;
-      sceneRef.current.renderer?.render(sceneRef.current.scene!, sceneRef.current.camera!);
-      requestAnimationFrame(animate);
+      if (sceneRef.current.renderer && sceneRef.current.scene && sceneRef.current.camera) {
+        sceneRef.current.renderer.render(sceneRef.current.scene, sceneRef.current.camera);
+      }
     };
 
     animate();
 
+    // Event listeners
     window.addEventListener('mousemove', handleMouseMove);
-
+    
     const handleResize = () => {
-      if (!sceneRef.current.camera || !sceneRef.current.renderer) return;
-
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      sceneRef.current.camera.aspect = width / height;
-      sceneRef.current.camera.updateProjectionMatrix();
-      sceneRef.current.renderer.setSize(width, height);
+      if (sceneRef.current.camera && sceneRef.current.renderer) {
+        sceneRef.current.camera.aspect = window.innerWidth / window.innerHeight;
+        sceneRef.current.camera.updateProjectionMatrix();
+        sceneRef.current.renderer.setSize(window.innerWidth, window.innerHeight);
+      }
     };
-
     window.addEventListener('resize', handleResize);
 
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
       mountRef.current?.removeChild(renderer.domElement);
     };
-  }, [currentSection]);
+  }, []);
 
   return <div ref={mountRef} className="fixed top-0 left-0 -z-10 w-full h-full" />;
 };

@@ -40,52 +40,33 @@ export const About = () => {
       <motion.div
         variants={containerVariants}
         initial="hidden"
-        animate="visible"
-        className="max-w-6xl mx-auto px-4 py-16 text-center"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        className="max-w-3xl mx-auto text-center"
       >
-        <motion.h2
-          variants={itemVariants}
-          className="text-4xl md:text-5xl font-bold mb-8 text-purple-200"
-        >
-          À propos de moi
+        <motion.h2 variants={itemVariants} className="title">
+          À Propos
         </motion.h2>
-
-        <motion.p
-          variants={itemVariants}
-          className="text-xl md:text-2xl mb-12 text-purple-300 max-w-3xl mx-auto"
-        >
-          Développeur Full Stack passionné par la création d'expériences web innovantes et immersives
+        <motion.p variants={itemVariants} className="text-lg mb-6">
+          Développeur Full Stack passionné par la création d'applications web modernes et performantes.
+          J'aime relever des défis techniques et apprendre de nouvelles technologies.
         </motion.p>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <motion.div
             variants={cardVariants}
-            className="bg-purple-900/30 backdrop-blur-sm p-6 rounded-xl shadow-xl"
+            whileHover={{ scale: 1.05 }}
+            className="card"
           >
-            <h3 className="text-2xl font-semibold mb-4 text-purple-200">Frontend</h3>
-            <p className="text-purple-300">
-              React, Vue.js, TypeScript, Tailwind CSS
-            </p>
+            <h3 className="subtitle">Frontend</h3>
+            <p>React, TypeScript, Tailwind CSS, Three.js</p>
           </motion.div>
-
           <motion.div
             variants={cardVariants}
-            className="bg-purple-900/30 backdrop-blur-sm p-6 rounded-xl shadow-xl"
+            whileHover={{ scale: 1.05 }}
+            className="card"
           >
-            <h3 className="text-2xl font-semibold mb-4 text-purple-200">Backend</h3>
-            <p className="text-purple-300">
-              Node.js, Express, Python, Django
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={cardVariants}
-            className="bg-purple-900/30 backdrop-blur-sm p-6 rounded-xl shadow-xl"
-          >
-            <h3 className="text-2xl font-semibold mb-4 text-purple-200">DevOps</h3>
-            <p className="text-purple-300">
-              Docker, CI/CD, AWS, Git
-            </p>
+            <h3 className="subtitle">Backend</h3>
+            <p>PHP, Node.js, SQL, NoSQL, API REST</p>
           </motion.div>
         </div>
       </motion.div>

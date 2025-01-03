@@ -47,7 +47,7 @@ export const Kitesurf = () => {
         <motion.h2 variants={itemVariants} className="title">
           Kitesurf
         </motion.h2>
-        <motion.p variants={itemVariants} className="text-lg mb-6 text-white/80">
+        <motion.p variants={itemVariants} className="text-lg mb-6 text-purple-200">
           Au-delà du développement, le kitesurf est ma passion. Cette discipline m'a appris la persévérance,
           la gestion du risque et l'importance de l'adaptation constante - des qualités que j'applique
           également dans mon travail de développeur.
@@ -59,10 +59,10 @@ export const Kitesurf = () => {
               scale: 1.05,
               transition: { duration: 0.2 }
             }}
-            className="card bg-white/10 backdrop-blur-sm"
+            className="card bg-purple-900/30 backdrop-blur-sm"
           >
-            <h3 className="subtitle text-white">Expérience</h3>
-            <p className="text-white/80">
+            <h3 className="subtitle text-purple-200">Expérience</h3>
+            <p className="text-purple-100">
               Plus de 5 ans de pratique dans différents spots à travers le monde
             </p>
           </motion.div>
@@ -72,10 +72,10 @@ export const Kitesurf = () => {
               scale: 1.05,
               transition: { duration: 0.2 }
             }}
-            className="card bg-white/10 backdrop-blur-sm"
+            className="card bg-purple-900/30 backdrop-blur-sm"
           >
-            <h3 className="subtitle text-white">Spots Favoris</h3>
-            <p className="text-white/80">
+            <h3 className="subtitle text-purple-200">Spots Favoris</h3>
+            <p className="text-purple-100">
               Fromentine, Tatajuba, Dakhla
             </p>
           </motion.div>
@@ -85,10 +85,10 @@ export const Kitesurf = () => {
               scale: 1.05,
               transition: { duration: 0.2 }
             }}
-            className="card bg-white/10 backdrop-blur-sm"
+            className="card bg-purple-900/30 backdrop-blur-sm"
           >
-            <h3 className="subtitle text-white">The ridery</h3>
-            <p className="text-white/80">
+            <h3 className="subtitle text-purple-200">The ridery</h3>
+            <p className="text-purple-100">
               Sponsorisé par The Ridery afin de promouvoir l'activité de kitesurf et le magasin
             </p>
           </motion.div>

@@ -14,15 +14,15 @@
 /* FullPage.js styles */
 #fp-nav ul li a span,
 .fp-slidesNav ul li a span {
-  background: white !important;
+  background: theme('colors.purple.300') !important;
 }
 
 #fp-nav ul li .fp-tooltip {
-  color: white !important;
+  color: theme('colors.purple.300') !important;
   font-family: theme('fontFamily.sans') !important;
 }
 
-/* Base styles */
+/* Prevent default scrolling */
 html, body {
   overflow: hidden;
   margin: 0;
@@ -41,14 +41,12 @@ html, body {
   @apply py-20 px-4 md:px-8;
 }
 
-/* Card styles */
 .card {
   @apply bg-white/10 backdrop-blur-lg rounded-xl p-6 hover:scale-105 transition-transform duration-300;
 }
 
-/* Typography */
 .title {
-  @apply text-4xl md:text-5xl font-bold mb-8 text-center text-white;
+  @apply text-4xl md:text-5xl font-bold mb-8 text-center;
 }
 
 .subtitle {
@@ -72,7 +70,6 @@ html, body {
   will-change: transform;
 }
 
-/* Hide FullPage.js watermark */
 .fp-watermark {
   display: none !important;
 }
