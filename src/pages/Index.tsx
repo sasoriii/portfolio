@@ -4,6 +4,8 @@ import { About } from "@/components/About";
 import { Projects } from "@/components/Projects";
 import { Contact } from "@/components/Contact";
 import { Kitesurf } from "@/components/Kitesurf";
+import { Formation } from "@/components/Formation";
+import { Experience } from "@/components/Experience";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionContext } from '@/context/SectionContext';
 
@@ -33,6 +35,8 @@ const Index = () => {
       </motion.div>
     )},
     { id: 'about', component: <About /> },
+    { id: 'formation', component: <Formation /> },
+    { id: 'experience', component: <Experience /> },
     { id: 'kitesurf', component: <Kitesurf /> },
     { id: 'projects', component: <Projects /> },
     { id: 'contact', component: <Contact /> }

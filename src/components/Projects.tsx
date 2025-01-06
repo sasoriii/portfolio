@@ -31,9 +31,9 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ title, description, url, fallbackImage }: ProjectCardProps) => {
-  const controls = useAnimation();
-  const [iframeError, setIframeError] = useState(false);
-  
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const y = useSpring(0, {
     stiffness: 100,
     damping: 30
@@ -68,10 +68,7 @@ const ProjectCard = ({ title, description, url, fallbackImage }: ProjectCardProp
     rotateX.set(0);
     rotateY.set(0);
     y.set(0);
-  };
-
-  const handleIframeError = () => {
-    setIframeError(true);
+    setIsHovered(false);
   };
 
   const style = {
@@ -86,42 +83,47 @@ const ProjectCard = ({ title, description, url, fallbackImage }: ProjectCardProp
       style={style}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group relative h-[500px] card-container cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      className="group relative h-full card-container"
       onClick={() => window.open(url, '_blank')}
     >
       <div className="card h-full transform-gpu z-10">
         <div className="relative z-10 h-full flex flex-col">
-          <div className="relative h-72 w-full mb-4 overflow-hidden rounded-t-xl bg-gray-800">
-            {!iframeError ? (
-              <iframe
-                src={url}
-                className="w-full h-full transform scale-[0.6] origin-top-left"
-                onError={handleIframeError}
-                style={{
-                  width: '170%',
-                  height: '170%',
-                  pointerEvents: 'none'
-                }}
-              />
-            ) : fallbackImage ? (
-              <img
-                src={fallbackImage}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-purple-200">
-                <span>Aperçu non disponible</span>
-              </div>
-            )}
+          <div className="relative h-48 sm:h-72 w-full mb-4 overflow-hidden rounded-t-xl bg-gray-800">
+            <img
+              src={fallbackImage}
+              alt={title}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50"></div>
           </div>
-          <div className="p-8 flex flex-col flex-grow">
-            <div className="h-2 w-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded mb-6"></div>
-            <h3 className="text-2xl font-bold text-purple-200 mb-4">{title}</h3>
-            <p className="text-purple-100/90 flex-grow text-lg">
+          <div className="p-4 sm:p-8 flex flex-col flex-grow">
+            <div className="h-2 w-12 sm:w-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded mb-4 sm:mb-6"></div>
+            <h3 className="text-xl sm:text-2xl font-bold text-purple-200 mb-2 sm:mb-4">{title}</h3>
+            <p className="text-sm sm:text-lg text-purple-100/90 flex-grow">
               {description}
             </p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isHovered ? 1 : 0 }}
+              className="mt-4 inline-flex items-center text-purple-300 text-sm sm:text-base"
+            >
+              En savoir plus
+              <svg
+                className="ml-2 w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -132,22 +134,22 @@ const ProjectCard = ({ title, description, url, fallbackImage }: ProjectCardProp
 export const Projects = () => {
   const projects = [
     {
-      title: "Le bureau du vent",
+      title: "Le bureau du vent (WIP)",
       description: "Site web de réservation de cours de kitesurf en ligne",
       url: "https://www.le-bureau-du-vent.com",
       fallbackImage: "/le-bureau-du-vent.png"
     },
     {
-      title: "Projet interne",
-      description: "Outil de redirection de flux",
-      url: "#",
-      fallbackImage: "/projet-interne.png"
+      title: "ftp deploy me",
+      description: "Package NPM qui avec une commande envoie le fichier build en ftp à un serveur définie",
+      url: "https://www.npmjs.com/package/ftp-deploy-me",
+      fallbackImage: "/ftp-deploy-me.png"
     },
     {
-      title: "Projet WIP",
-      description: "etc",
-      url: "#",
-      fallbackImage: "/projet-wip.png"
+      title: "Kite Guru (WIP)",
+      description: "Site web de réservation de coaching de kitesurf",
+      url: "https://www.kite-guru.jeremgabriel.com",
+      fallbackImage: "/kite-guru.png"
     }
   ];
 
@@ -159,19 +161,32 @@ export const Projects = () => {
         animate="visible"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="max-w-[95vw] mx-auto"
+        className="max-w-[95vw] mx-auto px-4"
       >
-        <motion.h2 variants={titleVariants} className="title text-purple-200 mb-16">
+        <motion.h2 variants={titleVariants} className="title text-purple-200 mb-8 md:mb-16">
           Mes Projets
         </motion.h2>
-        <div className="flex gap-8 overflow-x-auto pb-8 pt-12 snap-x snap-mandatory hide-scrollbar px-12">
-          {projects.map((project, index) => (
-            <div key={index} className={`min-w-[600px] snap-center pt-8 ${
-              index === 0 ? 'pl-8' : index === projects.length - 1 ? 'pr-8' : ''
-            }`}>
-              <ProjectCard {...project} />
-            </div>
-          ))}
+        {/* Mobile view */}
+        <div className="block md:hidden">
+          <div className="grid grid-cols-1 gap-4">
+            {projects.map((project, index) => (
+              <div key={index} className="h-[250px]">
+                <ProjectCard {...project} />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Desktop view */}
+        <div className="hidden md:block">
+          <div className="flex gap-8 overflow-x-auto pb-8 pt-12 snap-x snap-mandatory hide-scrollbar px-12">
+            {projects.map((project, index) => (
+              <div key={index} className={`min-w-[600px] snap-center pt-8 ${
+                index === 0 ? 'pl-8' : index === projects.length - 1 ? 'pr-8' : ''
+              }`}>
+                <ProjectCard {...project} />
+              </div>
+            ))}
+          </div>
         </div>
       </motion.div>
     </section>
